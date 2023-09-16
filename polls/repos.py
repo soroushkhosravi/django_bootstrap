@@ -9,6 +9,13 @@ class QuestionRepo:
         question = self._model(question_text="What's new?", pub_date=timezone.now())
         question.save()
 
+    def get_question(self, question_id):
+        """"""
+        try:
+            return self._model.objects.get(pk=question_id)
+        except self._model.DoesNotExist:
+            return None
+
 def get_question_repo():
     """Returns a repository."""
     return QuestionRepo()
