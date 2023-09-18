@@ -133,3 +133,11 @@ AUTHENTICATION_BACKENDS = [
     'jwt_auth.JWTBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://:{os.environ['REDIS_PASSWORD']}@{os.environ['REDIS_HOST']}:{os.environ['REDIS_PORT']}",
+        "KEY_FUNCTION": "redis_utils.create_redis_key"
+    }
+}

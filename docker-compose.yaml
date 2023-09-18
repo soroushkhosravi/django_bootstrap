@@ -6,14 +6,13 @@ services:
     command: gunicorn django_bootstrap.wsgi:application --bind 0.0.0.0:8000 --reload --workers 3
     volumes:
       - ./:/usr/src/app/
-#    ports:
-#      - 8000:8000
     expose:
       - 8000
     env_file:
       - ./.env.dev
     depends_on:
       - db
+      - cache
   db:
     image: postgres:15
     ports:
@@ -30,6 +29,16 @@ services:
       - 80:80
     depends_on:
       - web
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 20 1 --loglevel warning --requirepass redisPassword
+    volumes:
+      - ./data/redis:/data
+
+
 
 volumes:
   postgres_data:
