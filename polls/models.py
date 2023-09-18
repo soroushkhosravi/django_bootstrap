@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import datetime
+from django.db import transaction
 
 
 class Question(models.Model):
@@ -18,15 +19,16 @@ class Question(models.Model):
             choices: list
     ):
         """Adds a question with choices."""
-        question = cls(question_text=text, pub_date=pub_date)
-        question.save()
+        with transaction.atomic():
+            question = cls(question_text=text, pub_date=pub_date)
+            question.save()
 
-        for choice_text in choices:
-            choice = Choice(
-                question=question,
-                choice_text=choice_text
-            )
-            choice.save()
+            for choice_text in choices:
+                choice = Choice(
+                    question=question,
+                    choice_text=choice_text
+                )
+                choice.save()
 
 
 
