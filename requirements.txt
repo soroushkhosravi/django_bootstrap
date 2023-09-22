@@ -5,3 +5,4 @@ PyJwt
 pytest-django
 redis
 fakeredis
+djangorestframework
