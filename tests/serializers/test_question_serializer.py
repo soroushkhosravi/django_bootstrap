@@ -17,7 +17,9 @@ from polls.serializers import QuestionSerializer
             OrderedDict(
                 [
                     ("question_text", "abc"),
-                    ("pub_date", datetime(year=2000, month=10, day=5, tzinfo=ZoneInfo(key="UTC")))])
+                    ("pub_date", datetime(year=2000, month=10, day=5, tzinfo=ZoneInfo(key="UTC")))
+                ]
+            )
         ),
         (
             {"pub_date": timezone.now()},
