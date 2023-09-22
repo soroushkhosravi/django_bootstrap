@@ -7,6 +7,10 @@ class Question(models.Model):
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField("date published")
 
+    class Meta:
+        """Meta class for the model."""
+        db_table = "question"
+
     def choices_with_specific_votes(self, number_of_votes: int):
         """Returns all the chices with 5 votes."""
         return self.choices.filter(votes=number_of_votes)
@@ -36,3 +40,7 @@ class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="choices")
     choice_text = models.CharField(max_length=200)
     votes = models.IntegerField(default=0)
+
+    class Meta:
+        """Meta class for the model."""
+        db_table = "choice"
