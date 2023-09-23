@@ -8,13 +8,9 @@ from .models import Question, Choice
 
 class ChoiceSerializer(serializers.ModelSerializer):
     """The choice serializer."""
-    id = serializers.IntegerField(read_only=True)
-    choice_text = serializers.CharField(max_length=200)
-    votes = serializers.IntegerField()
-
     class Meta:
         model = Choice
-        fields = '__all__'
+        fields = ['choice_text', 'votes']
 
 
 class QuestionSerializer(serializers.ModelSerializer):

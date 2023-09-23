@@ -7,6 +7,7 @@ from zoneinfo import ZoneInfo
 
 from polls.serializers import QuestionSerializer, ChoiceSerializer
 from repositories import get_question_repository
+from polls.models import Question, Choice
 
 
 @pytest.mark.parametrize(
@@ -16,14 +17,18 @@ from repositories import get_question_repository
             {
                 "question_text": "abc",
                 "pub_date": timezone.datetime(year=2000, month=10, day=5),
-                "question_choices": []
+                "question_choices": [
+                    {
+                        "choice_text": "abc"
+                    }
+                ]
             },
             True,
             OrderedDict(
                 [
                     ("question_text", "abc"),
                     ("pub_date", datetime(year=2000, month=10, day=5, tzinfo=ZoneInfo(key="UTC"))),
-                    ("question_choices", []),
+                    ("question_choices", [{"choice_text": "abc"}]),
                 ]
             )
         ),
@@ -56,7 +61,7 @@ def test_create_adds_model_to_the_database():
     valid_data = {
         "question_text": "abc",
         "pub_date": datetime(year=2000, month=10, day=5),
-        "question_choices": []
+        "question_choices": [{"choice_text": "abc"}]
     }
 
     QuestionSerializer.create(data=valid_data)
@@ -70,7 +75,15 @@ def test_create_adds_model_to_the_database():
     assert added_question.id == 1
     assert added_question.question_text == valid_data["question_text"]
     assert added_question.pub_date == datetime(2000, 10, 5, 0, 0, tzinfo=ZoneInfo(key="UTC"))
-    assert len(added_question.choices.all()) == 0
+    assert len(added_question.choices.all()) == 1
+
+    choice = added_question.choices.all()[0]
+
+    assert isinstance(choice, Choice)
+    assert choice.id == 1
+    assert choice.question_id == 1
+    assert choice.votes == 0
+    assert choice.choice_text == "abc"
 
 
 @pytest.mark.django_db(reset_sequences=True)
@@ -89,3 +102,13 @@ def test_create_does_not_add_model_to_the_database_with_invalid_date():
     all_questions = get_question_repository()._model.objects.all()
 
     assert len(all_questions) == 0
+
+@pytest.mark.django_db(reset_sequences=True)
+def test_choice_serializer():
+    """Tests validating data."""
+    data = {
+        "choice_text": "This is a text",
+        "votes": 10
+    }
+
+    assert ChoiceSerializer(data=data).is_valid() == True
