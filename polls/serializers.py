@@ -14,5 +14,4 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        # fields = ("id", "question_text", "pub_date")
         fields = '__all__'
