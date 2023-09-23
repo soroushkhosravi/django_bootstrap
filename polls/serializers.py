@@ -2,6 +2,7 @@
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import ErrorDetail, ValidationError
+from rest_framework.exceptions import ValidationError
 
 from .models import Question
 
@@ -15,3 +16,15 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = '__all__'
+
+    @classmethod
+    def create(cls, data: dict):
+        """Creates a model in the database."""
+        serializer = cls(data=data)
+
+        if serializer.is_valid():
+            question = Question.objects.create(**serializer.validated_data)
+        else:
+            raise ValidationError("data was not validated.")
+
+        return question
