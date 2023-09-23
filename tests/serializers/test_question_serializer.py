@@ -5,7 +5,7 @@ from datetime import datetime
 from django.utils import timezone
 from zoneinfo import ZoneInfo
 
-from polls.serializers import QuestionSerializer
+from polls.serializers import QuestionSerializer, ChoiceSerializer
 from repositories import get_question_repository
 
 
@@ -13,12 +13,17 @@ from repositories import get_question_repository
     "data, is_valid, validated_data",
     [
         (
-            {"question_text": "abc", "pub_date": timezone.datetime(year=2000, month=10, day=5)},
+            {
+                "question_text": "abc",
+                "pub_date": timezone.datetime(year=2000, month=10, day=5),
+                "question_choices": []
+            },
             True,
             OrderedDict(
                 [
                     ("question_text", "abc"),
-                    ("pub_date", datetime(year=2000, month=10, day=5, tzinfo=ZoneInfo(key="UTC")))
+                    ("pub_date", datetime(year=2000, month=10, day=5, tzinfo=ZoneInfo(key="UTC"))),
+                    ("question_choices", []),
                 ]
             )
         ),
@@ -48,7 +53,11 @@ def test_create_adds_model_to_the_database():
 
     assert len(all_questions) == 0
 
-    valid_data = {"question_text": "abc", "pub_date": datetime(year=2000, month=10, day=5)}
+    valid_data = {
+        "question_text": "abc",
+        "pub_date": datetime(year=2000, month=10, day=5),
+        "question_choices": []
+    }
 
     QuestionSerializer.create(data=valid_data)
 
@@ -61,6 +70,7 @@ def test_create_adds_model_to_the_database():
     assert added_question.id == 1
     assert added_question.question_text == valid_data["question_text"]
     assert added_question.pub_date == datetime(2000, 10, 5, 0, 0, tzinfo=ZoneInfo(key="UTC"))
+    assert len(added_question.choices.all()) == 0
 
 
 @pytest.mark.django_db(reset_sequences=True)
