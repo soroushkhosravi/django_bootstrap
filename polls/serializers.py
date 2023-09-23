@@ -29,7 +29,10 @@ class QuestionSerializer(serializers.ModelSerializer):
         """Creates a model in the database."""
         serializer = cls(data=data)
         if serializer.is_valid():
-            question_choices = serializer.validated_data.pop('question_choices')
+            try:
+                question_choices = serializer.validated_data.pop('question_choices')
+            except KeyError:
+                question_choices = []
             question = Question.objects.create(**serializer.validated_data)
 
             for choice in question_choices:
