@@ -33,3 +33,6 @@ class QuestionSerializer(serializers.ModelSerializer):
             Choice.objects.create(question=question, **choice)
 
         return question
+
+    def update(self, instance, validate_data: dict):
+        """Updates an instance through passed data."""
