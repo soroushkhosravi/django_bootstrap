@@ -14,34 +14,60 @@ from polls.models import Question, Choice
     "data, is_valid, validated_data",
     [
         (
-            {
-                "question_text": "abc",
-                "pub_date": timezone.datetime(year=2000, month=10, day=5),
-                "question_choices": [
-                    {
-                        "choice_text": "abc"
-                    }
-                ]
-            },
-            True,
-            OrderedDict(
-                [
-                    ("question_text", "abc"),
-                    ("pub_date", datetime(year=2000, month=10, day=5, tzinfo=ZoneInfo(key="UTC"))),
-                    ("question_choices", [{"choice_text": "abc"}]),
-                ]
-            )
+                {
+                    "question_text": "abc",
+                    "pub_date": timezone.datetime(year=2000, month=10, day=5),
+                    "question_choices": [
+                        {
+                            "choice_text": "abc"
+                        }
+                    ]
+                },
+                True,
+                OrderedDict(
+                    [
+                        ("question_choices", [{"choice_text": "abc"}]),
+                        ("question_text", "abc"),
+                        ("pub_date", datetime(year=2000, month=10, day=5, tzinfo=ZoneInfo(key="UTC"))),
+                    ]
+                )
         ),
         (
-            {"pub_date": timezone.now()},
-            False,
-            {}
+                {"pub_date": timezone.now()},
+                False,
+                {}
         ),
         (
-            {"question_text": "abc", "pub_date": 100},
-            False,
-            {}
-        )
+                {"question_text": "abc", "pub_date": 100},
+                False,
+                {}
+        ),
+        (
+                {
+                    "question_text": "abc",
+                    "pub_date": timezone.datetime(year=2000, month=10, day=5)
+                },
+                True,
+                OrderedDict(
+                    [
+                        ("question_text", "abc"),
+                        ("pub_date", datetime(year=2000, month=10, day=5, tzinfo=ZoneInfo(key="UTC"))),
+                    ]
+                )
+        ),
+        (
+                {
+                    "question_text": "abc",
+                    "pub_date": timezone.datetime(year=2000, month=10, day=5),
+                    "question_choices": [
+                        {
+                            "votes": 5
+                        }
+                    ]
+                },
+                False,
+                {}
+        ),
     ]
 )
 def test_serializer_validates_data_as_expected(data, is_valid, validated_data):
@@ -64,7 +90,9 @@ def test_create_adds_question_to_the_database_with_choices():
         "question_choices": [{"choice_text": "abc"}]
     }
 
-    QuestionSerializer.create(data=valid_data)
+    serializer = QuestionSerializer(data=valid_data)
+    serializer.is_valid()
+    serializer.save()
 
     all_questions = get_question_repository()._model.objects.all()
 
@@ -98,10 +126,11 @@ def test_create_adds_question_itself_if_choices_not_provided():
         "pub_date": datetime(year=2000, month=10, day=5)
     }
 
-    QuestionSerializer.create(data=valid_data)
+    serializer = QuestionSerializer(data=valid_data)
+    serializer.is_valid()
+    serializer.save()
 
     all_questions = get_question_repository()._model.objects.all()
-
     assert len(all_questions) == 1
 
     added_question = all_questions[0]
@@ -113,28 +142,23 @@ def test_create_adds_question_itself_if_choices_not_provided():
 
 
 @pytest.mark.django_db(reset_sequences=True)
-def test_create_does_not_add_model_to_the_database_with_invalid_date():
+def test_serializer_raises_exception_if_saved_with_invalid_data():
     """Tests we can add models to database with serializer."""
     all_questions = get_question_repository()._model.objects.all()
 
     assert len(all_questions) == 0
 
     invalid_data = {"question_text": "abc"}
-    with pytest.raises(Exception) as error:
-        QuestionSerializer.create(data=invalid_data)
 
-    assert str(error.value) == "[ErrorDetail(string='data was not validated.', code='invalid')]"
+    serializer = QuestionSerializer(data=invalid_data)
+    serializer.is_valid()
 
-    all_questions = get_question_repository()._model.objects.all()
+    assert serializer.validated_data == {}
+    assert serializer.errors is not None
 
-    assert len(all_questions) == 0
+    with pytest.raises(AssertionError) as error:
+        serializer.save()
 
-@pytest.mark.django_db(reset_sequences=True)
-def test_choice_serializer():
-    """Tests validating data."""
-    data = {
-        "choice_text": "This is a text",
-        "votes": 10
-    }
-
-    assert ChoiceSerializer(data=data).is_valid() == True
+    assert str(error.value) == (
+        "You cannot call `.save()` on a serializer with invalid data."
+    )
