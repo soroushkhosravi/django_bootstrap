@@ -47,12 +47,14 @@ class QuestionSerializer(serializers.ModelSerializer):
                 instance.pub_date = validate_data.get("pub_date", instance.pub_date)
                 instance.save()
                 if choices := validate_data.get("question_choices"):
+
                     for choice in choices:
                         if choice.get("id"):
                             question_choice = instance.choices.get(pk=choice["id"])
                             question_choice.choice_text = choice.get(
                                 "choice_text", question_choice.choice_text
                             )
+                            question_choice.save()
                         else:
                             Choice.objects.create(**choice, question=instance)
         except Exception:
