@@ -190,7 +190,6 @@ def test_serializer_can_update_instance():
     serializer =QuestionSerializer(question, data=valid_data)
 
     assert serializer.is_valid() is True
-
     serializer.save()
 
     assert question.id == 1

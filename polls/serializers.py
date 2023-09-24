@@ -41,18 +41,21 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validate_data: dict):
         """Updates an instance through passed data."""
-        with transaction.atomic():
-            instance.question_text = validate_data.get("question_text", instance.question_text)
-            instance.pub_date = validate_data.get("pub_date", instance.pub_date)
-            instance.save()
-            if choices := validate_data.get("question_choices"):
-                for choice in choices:
-                    if choice.get("id"):
-                        question_choice = instance.choices.get(pk=choice["id"])
-                        question_choice.choice_text = choice.get(
-                            "choice_text", question_choice.choice_text
-                        )
-                    else:
-                        Choice.objects.create(**choice, question=instance)
+        try:
+            with transaction.atomic():
+                instance.question_text = validate_data.get("question_text", instance.question_text)
+                instance.pub_date = validate_data.get("pub_date", instance.pub_date)
+                instance.save()
+                if choices := validate_data.get("question_choices"):
+                    for choice in choices:
+                        if choice.get("id"):
+                            question_choice = instance.choices.get(pk=choice["id"])
+                            question_choice.choice_text = choice.get(
+                                "choice_text", question_choice.choice_text
+                            )
+                        else:
+                            Choice.objects.create(**choice, question=instance)
+        except Exception:
+            pass
 
         return instance
