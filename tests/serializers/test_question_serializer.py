@@ -162,3 +162,45 @@ def test_serializer_raises_exception_if_saved_with_invalid_data():
     assert str(error.value) == (
         "You cannot call `.save()` on a serializer with invalid data."
     )
+
+
+@pytest.mark.django_db(reset_sequences=True)
+def test_serializer_can_update_instance():
+    """Tests we can add models to database with serializer."""
+    question = Question.objects.create(
+        question_text="question",
+        pub_date=datetime.now()
+    )
+    choice = Choice.objects.create(
+        choice_text="abc",
+        question=question
+    )
+    assert question.id == 1
+
+    valid_data = {
+        "question_text": "changed",
+        "pub_date": "2023-09-24T16:42:23.771150",
+        "question_choices": [
+            {
+                "choice_text": "choice 1"
+            }
+        ]
+    }
+
+    serializer =QuestionSerializer(question, data=valid_data)
+
+    assert serializer.is_valid() is True
+
+    serializer.save()
+
+    assert question.id == 1
+    assert question.question_text == "changed"
+    assert question.pub_date == datetime(
+        2023, 9, 24, 16, 42, 23, 771150,  tzinfo=ZoneInfo(key="UTC")
+    )
+
+    choices = question.choices.all()
+    assert len(choices) == 2
+
+    assert choices[0].id == 1
+    assert choices[1].id == 2
