@@ -6,3 +6,4 @@ pytest-django
 redis
 fakeredis
 djangorestframework
+celery
