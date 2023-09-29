@@ -38,6 +38,15 @@ services:
     volumes:
       - ./data/redis:/data
 
+  celery-worker:
+    build: .
+    command: celery -A django_celery worker
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - cache
+
+
 
 
 volumes:
