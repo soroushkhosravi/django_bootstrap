@@ -40,7 +40,7 @@ services:
 
   celery-worker:
     build: .
-    command: celery -A django_celery worker
+    command: celery -A django_bootstrap worker -l INFO
     env_file:
       - ./.env.dev
     depends_on:
