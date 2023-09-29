@@ -7,3 +7,4 @@ redis
 fakeredis
 djangorestframework
 celery
+watchfiles
