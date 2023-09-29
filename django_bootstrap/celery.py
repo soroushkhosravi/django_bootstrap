@@ -16,12 +16,3 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
-
-
-@app.task(bind=True, ignore_result=True, name="add_question")
-def create_question(self):
-    from application_services import get_question_service
-    question_service = get_question_service().add_question(
-        question_text="A question from inside the celery task."
-    )
-    return question_service.id
