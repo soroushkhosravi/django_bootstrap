@@ -8,3 +8,4 @@ fakeredis
 djangorestframework
 celery
 watchfiles
+django-cursor-pagination
