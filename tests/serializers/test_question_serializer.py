@@ -272,7 +272,9 @@ def test_serializer_does_atomic_transactions():
 
     serializer = QuestionSerializer(question, data=valid_data_with_not_existing_choice_for_update)
     serializer.is_valid()
-    serializer.save()
+    question = serializer.save()
+
+    assert question.id == 1
 
     questions = Question.objects.all()
     assert len(questions) == 1
