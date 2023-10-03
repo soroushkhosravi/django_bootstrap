@@ -1,6 +1,7 @@
 """The question application service to do actions on questions."""
 from repositories.question import QuestionRepo
 from django.utils import timezone
+from serializers.question import QuestionSerializer
 
 class QuestionService:
     def __init__(
@@ -17,4 +18,14 @@ class QuestionService:
         question.save()
         self._cache.set(str(question.id), question.question_text)
         return question
+
+    def get_question(self, question_id: int):
+        """Returns a question data by it's ID."""
+        question = self._repo.get_question(question_id=question_id)
+
+        if not question:
+            raise Exception("Question not found.")
+
+        return QuestionSerializer(question).data
+
 
