@@ -1,17 +1,19 @@
 """The question application service to do actions on questions."""
 from repositories.question import QuestionRepo
 from django.utils import timezone
-from serializers.question import QuestionSerializer
 import json
 
 class QuestionService:
     def __init__(
             self,
             repo: QuestionRepo,
-            cache
+            cache,
+            data_serializer
     ):
         self._repo = repo
         self._cache = cache
+        self._data_serializer = data_serializer
+
 
     def add_question(self, question_text: str):
         """Adds a question to the database."""
@@ -27,7 +29,7 @@ class QuestionService:
         if not question:
             raise Exception("Question not found.")
 
-        return QuestionSerializer(question).data
+        return self._data_serializer(question).data
 
     def update_question(self, question_id, question_data):
         """Updates a question by it's ID."""
@@ -36,7 +38,7 @@ class QuestionService:
         if not question:
             raise Exception("Question not found.")
 
-        serializer = QuestionSerializer(question, data=question_data)
+        serializer = self._data_serializer(question, data=question_data)
 
         if serializer.is_valid():
             serializer.update(instance=question, validate_data=serializer.validated_data)
