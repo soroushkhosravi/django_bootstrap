@@ -2,14 +2,14 @@
 import pytest
 from collections import OrderedDict
 from datetime import datetime
+from django.http import HttpResponse
+from django.test import RequestFactory
 from django.utils import timezone
 from zoneinfo import ZoneInfo
 
-from polls.serializers import QuestionSerializer, ChoiceSerializer
+from polls.models import Choice, Question
+from polls.serializers import ChoiceSerializer, QuestionSerializer
 from repositories import get_question_repository
-from polls.models import Question, Choice
-from django.http import HttpResponse
-from django.test import RequestFactory
 
 
 @pytest.mark.parametrize(
@@ -250,8 +250,13 @@ def test_updating_existing_choice_through_question():
     assert choices[0].choice_text == "choice 1"
 
 
-def view_simulator(request):
-    """This is a test view function to enable us to test serializer in a view endpoint."""
+@pytest.mark.django_db(reset_sequences=True)
+def test_serializer_does_atomic_transactions():
+    """In this test we test that question is not updated if choice data is not valid for update."""
+    questions = Question.objects.all()
+
+    assert len(questions) == 0
+
     question = Question.objects.create(question_text="question 1", pub_date=datetime.now())
 
     valid_data_with_not_existing_choice_for_update = {
@@ -268,16 +273,6 @@ def view_simulator(request):
     serializer = QuestionSerializer(question, data=valid_data_with_not_existing_choice_for_update)
     serializer.is_valid()
     serializer.save()
-
-
-@pytest.mark.django_db(reset_sequences=True)
-def test_serializer_does_atomic_transactions():
-    """In this test we test that question is not updated if choice data is not valid for update."""
-    request = RequestFactory().get("/endpoint")
-    questions = Question.objects.all()
-
-    assert len(questions) == 0
-    view_simulator(request=request)
 
     questions = Question.objects.all()
     assert len(questions) == 1
