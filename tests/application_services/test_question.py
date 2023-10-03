@@ -1,7 +1,7 @@
 """Tests related to the question application service."""
 from application_services import get_question_service
 import pytest
-from polls.models import Question
+from polls.models import Question, Choice
 from datetime import datetime
 from freezegun import freeze_time
 
@@ -64,6 +64,20 @@ def test_update_question_raises_exception_if_data_not_valid(service):
     )
 
 
+@freeze_time("2020-10-10")
+@pytest.mark.django_db(reset_sequences=True)
+def test_delete_deletes_specific_question(service):
+    """Tests we can get the question's data."""
+    question = Question.objects.create(
+        question_text="First question",
+        pub_date=datetime.now()
+    )
+    Choice.objects.create(choice_text="choice", question=question)
+    questions = Question.objects.all()
 
+    assert len(questions) == 1
 
+    service.delete_question(question_id=1)
 
+    questions = Question.objects.all()
+    assert len(questions) == 0

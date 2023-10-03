@@ -47,3 +47,12 @@ class QuestionService:
 
 
         return serializer.data
+
+    def delete_question(self, question_id):
+        """Deletes a question."""
+        question = self._repo.get_question(question_id=question_id)
+
+        if not question:
+            raise Exception("Question not found.")
+
+        question.delete()
