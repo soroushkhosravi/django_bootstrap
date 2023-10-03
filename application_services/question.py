@@ -2,6 +2,7 @@
 from repositories.question import QuestionRepo
 from django.utils import timezone
 from serializers.question import QuestionSerializer
+import json
 
 class QuestionService:
     def __init__(
@@ -28,4 +29,19 @@ class QuestionService:
 
         return QuestionSerializer(question).data
 
+    def update_question(self, question_id, question_data):
+        """Updates a question by it's ID."""
+        question = self._repo.get_question(question_id=question_id)
 
+        if not question:
+            raise Exception("Question not found.")
+
+        serializer = QuestionSerializer(question, data=question_data)
+
+        if serializer.is_valid():
+            serializer.update(instance=question, validate_data=serializer.validated_data)
+        else:
+            raise Exception(str(serializer.errors))
+
+
+        return serializer.data

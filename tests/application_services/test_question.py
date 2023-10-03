@@ -23,6 +23,47 @@ def test_get_question_data_returns_expected_data(service):
 
     assert data == {'id': 1, 'pub_date': '2020-10-10T00:00:00Z', 'question_text': 'First question'}
 
+@freeze_time("2020-10-10")
+@pytest.mark.django_db(reset_sequences=True)
+def test_update_question_updates_question_as_expected(service):
+    """Tests we can get the question's data."""
+    Question.objects.create(
+        question_text="First question",
+        pub_date=datetime.now()
+    )
+
+    data = service.update_question(
+        question_id=1,
+        question_data={
+            "question_text": "changed",
+            "pub_date": "2020-10-15"
+        }
+    )
+
+    assert data == {'id': 1, 'pub_date': '2020-10-15T00:00:00Z', 'question_text': 'changed'}
+
+
+@freeze_time("2020-10-10")
+@pytest.mark.django_db(reset_sequences=True)
+def test_update_question_raises_exception_if_data_not_valid(service):
+    """Tests we can get the question's data."""
+    Question.objects.create(
+        question_text="First question",
+        pub_date=datetime.now()
+    )
+
+    with pytest.raises(Exception) as error:
+        service.update_question(
+            question_id=1,
+            question_data={"invalid_key": "invalid_value"}
+        )
+
+    assert str(error.value) == (
+        "{'question_text': [ErrorDetail(string='This field is required.', code='required')], "
+        "'pub_date': [ErrorDetail(string='This field is required.', code='required')]}"
+    )
+
+
 
 
 
