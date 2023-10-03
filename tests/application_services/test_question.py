@@ -4,11 +4,14 @@ import pytest
 from polls.models import Question, Choice
 from datetime import datetime
 from freezegun import freeze_time
+from exceptions import ServiceException
+
 
 @pytest.fixture
 def service():
     """A fixture for the tests."""
     return get_question_service()
+
 
 @freeze_time("2020-10-10")
 @pytest.mark.django_db(reset_sequences=True)
@@ -52,7 +55,7 @@ def test_update_question_raises_exception_if_data_not_valid(service):
         pub_date=datetime.now()
     )
 
-    with pytest.raises(Exception) as error:
+    with pytest.raises(ServiceException) as error:
         service.update_question(
             question_id=1,
             question_data={"invalid_key": "invalid_value"}
