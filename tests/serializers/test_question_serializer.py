@@ -8,7 +8,7 @@ from django.utils import timezone
 from zoneinfo import ZoneInfo
 
 from polls.models import Choice, Question
-from polls.serializers import ChoiceSerializer, QuestionSerializer
+from serializers.question import QuestionSerializer, ChoiceSerializer
 from repositories import get_question_repository
 
 

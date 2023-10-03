@@ -5,7 +5,7 @@ from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework.exceptions import ValidationError
 from django.db import transaction
 
-from .models import Question, Choice
+from polls.models import Question, Choice
 
 class ChoiceSerializer(serializers.ModelSerializer):
     """The choice serializer."""

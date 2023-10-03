@@ -1,6 +1,6 @@
 """Tests related to the choice serializer."""
 import pytest
-from polls.serializers import ChoiceSerializer
+from serializers.question import ChoiceSerializer
 
 @pytest.mark.parametrize(
     "data, is_valid, validated_data",
