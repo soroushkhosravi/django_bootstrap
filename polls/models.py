@@ -12,7 +12,7 @@ class Question(models.Model):
         db_table = "question"
 
     def choices_with_specific_votes(self, number_of_votes: int):
-        """Returns all the chices with 5 votes."""
+        """Returns all the choices with 5 votes."""
         return self.choices.filter(votes=number_of_votes)
 
     @classmethod
