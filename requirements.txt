@@ -9,3 +9,4 @@ djangorestframework
 celery
 watchfiles
 django-cursor-pagination
+djangorestframework-dataclasses
