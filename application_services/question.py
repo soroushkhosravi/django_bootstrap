@@ -19,7 +19,6 @@ class QuestionService:
         """Adds a question to the database."""
         question = self._repo._model(question_text=question_text, pub_date=timezone.now())
         question.save()
-        self._cache.set(str(question.id), question.question_text)
         return question
 
     def get_question(self, question_id: int):
@@ -27,7 +26,7 @@ class QuestionService:
         question = self._repo.get_question(question_id=question_id)
 
         if not question:
-            raise Exception("Question not found.")
+            raise ServiceException("Question not found.")
 
         return self._data_serializer(question).data
 
@@ -36,7 +35,7 @@ class QuestionService:
         question = self._repo.get_question(question_id=question_id)
 
         if not question:
-            raise Exception("Question not found.")
+            raise ServiceException("Question not found.")
 
         serializer = self._data_serializer(question, data=question_data)
 

@@ -25,5 +25,4 @@ def test_service_can_add_model_and_sets_id_in_cache(service):
     assert len(Question.objects.all()) == 0
 
     service.add_question(question_text="This is a question.")
-    assert service._cache.get(1).decode() == "This is a question."
     assert len(Question.objects.all()) == 1
