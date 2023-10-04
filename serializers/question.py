@@ -17,19 +17,20 @@ class ChoiceSerializer(serializers.ModelSerializer):
 
 class QuestionSerializer(serializers.ModelSerializer):
     """The question serializer."""
-    question_choices = ChoiceSerializer(
+    choices = ChoiceSerializer(
         many=True,
         required=False
     )
 
     class Meta:
         model = Question
-        fields = '__all__'
+        # fields = '__all__'
+        fields = ['id', 'question_text', 'pub_date', 'choices']
 
     def create(self, validated_data: dict):
         """Creates a model in the database."""
         try:
-            question_choices = validated_data.pop('question_choices')
+            question_choices = validated_data.pop('choices')
         except KeyError:
             question_choices = []
         question = Question.objects.create(**validated_data)
@@ -46,7 +47,7 @@ class QuestionSerializer(serializers.ModelSerializer):
                 instance.question_text = validate_data.get("question_text", instance.question_text)
                 instance.pub_date = validate_data.get("pub_date", instance.pub_date)
                 instance.save()
-                if choices := validate_data.get("question_choices"):
+                if choices := validate_data.get("choices"):
 
                     for choice in choices:
                         if choice.get("id"):

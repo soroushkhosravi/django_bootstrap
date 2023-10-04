@@ -19,7 +19,7 @@ from repositories import get_question_repository
                 {
                     "question_text": "abc",
                     "pub_date": timezone.datetime(year=2000, month=10, day=5),
-                    "question_choices": [
+                    "choices": [
                         {
                             "choice_text": "abc"
                         }
@@ -28,9 +28,9 @@ from repositories import get_question_repository
                 True,
                 OrderedDict(
                     [
-                        ("question_choices", [{"choice_text": "abc"}]),
                         ("question_text", "abc"),
                         ("pub_date", datetime(year=2000, month=10, day=5, tzinfo=ZoneInfo(key="UTC"))),
+                        ("choices", [{"choice_text": "abc"}]),
                     ]
                 )
         ),
@@ -61,7 +61,7 @@ from repositories import get_question_repository
                 {
                     "question_text": "abc",
                     "pub_date": timezone.datetime(year=2000, month=10, day=5),
-                    "question_choices": [
+                    "choices": [
                         {
                             "votes": 5
                         }
@@ -89,7 +89,7 @@ def test_create_adds_question_to_the_database_with_choices():
     valid_data = {
         "question_text": "abc",
         "pub_date": datetime(year=2000, month=10, day=5),
-        "question_choices": [{"choice_text": "abc"}]
+        "choices": [{"choice_text": "abc"}]
     }
 
     serializer = QuestionSerializer(data=valid_data)
@@ -182,7 +182,7 @@ def test_serializer_can_update_instance():
     valid_data = {
         "question_text": "changed",
         "pub_date": "2023-09-24T16:42:23.771150",
-        "question_choices": [
+        "choices": [
             {
                 "choice_text": "choice 1"
             }
@@ -224,7 +224,7 @@ def test_updating_existing_choice_through_question():
     valid_data = {
         "question_text": "changed",
         "pub_date": "2023-09-24T16:42:23.771150",
-        "question_choices": [
+        "choices": [
             {
                 "choice_text": "choice 1",
                 "id": 1
@@ -262,7 +262,7 @@ def test_serializer_does_atomic_transactions():
     valid_data_with_not_existing_choice_for_update = {
         "question_text": "changed",
         "pub_date": "2023-09-24T16:42:23.771150",
-        "question_choices": [
+        "choices": [
             {
                 "choice_text": "choice 1",
                 "id": 1

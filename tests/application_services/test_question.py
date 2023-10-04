@@ -24,7 +24,13 @@ def test_get_question_data_returns_expected_data(service):
 
     data = service.get_question(question_id=1)
 
-    assert data == {'id': 1, 'pub_date': '2020-10-10T00:00:00Z', 'question_text': 'First question'}
+    assert data == {
+        'id': 1,
+        'pub_date': '2020-10-10T00:00:00Z',
+        'question_text': 'First question',
+        'choices': []
+    }
+
 
 @freeze_time("2020-10-10")
 @pytest.mark.django_db(reset_sequences=True)
@@ -39,11 +45,11 @@ def test_update_question_updates_question_as_expected(service):
         question_id=1,
         question_data={
             "question_text": "changed",
-            "pub_date": "2020-10-15"
+            "pub_date": "2020-10-15",
         }
     )
 
-    assert data == {'id': 1, 'pub_date': '2020-10-15T00:00:00Z', 'question_text': 'changed'}
+    assert data == {'id': 1, 'pub_date': '2020-10-15T00:00:00Z', 'question_text': 'changed', 'choices': []}
 
 
 @freeze_time("2020-10-10")
