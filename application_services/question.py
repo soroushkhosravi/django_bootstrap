@@ -2,6 +2,7 @@
 from repositories.question import QuestionRepo
 from django.utils import timezone
 from exceptions import ServiceException
+from polls.models import Question
 
 
 class QuestionService:
@@ -15,13 +16,13 @@ class QuestionService:
         self._cache = cache
         self._data_serializer = data_serializer
 
-    def add_question(self, question_text: str):
+    def add_question(self, question_text: str) -> Question:
         """Adds a question to the database."""
         question = self._repo._model(question_text=question_text, pub_date=timezone.now())
         question.save()
         return question
 
-    def get_question(self, question_id: int):
+    def get_question(self, question_id: int) -> dict:
         """Returns a question data by it's ID."""
         question = self._repo.get_question(question_id=question_id)
 
@@ -30,7 +31,7 @@ class QuestionService:
 
         return self._data_serializer(question).data
 
-    def update_question(self, question_id, question_data):
+    def update_question(self, question_id, question_data) -> dict:
         """Updates a question by it's ID."""
         question = self._repo.get_question(question_id=question_id)
 
@@ -46,7 +47,7 @@ class QuestionService:
 
         return serializer.data
 
-    def delete_question(self, question_id):
+    def delete_question(self, question_id: int) -> None:
         """Deletes a question."""
         question = self._repo.get_question(question_id=question_id)
 
