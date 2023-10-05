@@ -1,8 +1,9 @@
 """Views related to the polls application."""
 from django.http import HttpResponse, JsonResponse
 
+from django.views.decorators.csrf import csrf_exempt
 from application_services import get_question_service
-from repositories import get_question_repository
+from exceptions import ServiceException
 
 
 def index(request):
@@ -10,11 +11,14 @@ def index(request):
     return JsonResponse({"message": "successful."}, status=200)
 
 
-def get_question(request, question_id):
-    """return poll with id."""
-    question = get_question_repository().get_question(question_id=question_id)
-    if question:
-        return JsonResponse({"message": "successful."})
+@csrf_exempt
+def question(request, question_id):
+    """handles all actions related to question."""
+    question_service = get_question_service()
+    if request.method == 'GET':
+        try:
+            return JsonResponse(question_service.get_question(question_id=question_id))
+        except ServiceException:
+            return JsonResponse(data={"message": "Question not found", "status": "error"}, status=400)
 
-    return HttpResponse("Question not found.", status=400)
 
