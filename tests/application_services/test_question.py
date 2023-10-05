@@ -1,10 +1,13 @@
 """Tests related to the question application service."""
-from application_services import get_question_service
-import pytest
-from polls.models import Question, Choice
+from collections import OrderedDict
 from datetime import datetime
+
+import pytest
 from freezegun import freeze_time
+
+from application_services import get_question_service
 from exceptions import ServiceException
+from polls.models import Choice, Question
 
 
 @pytest.fixture
@@ -17,9 +20,18 @@ def service():
 @pytest.mark.django_db(reset_sequences=True)
 def test_get_question_data_returns_expected_data(service):
     """Tests we can get the question's data."""
-    Question.objects.create(
+    question = Question.objects.create(
         question_text="First question",
         pub_date=datetime.now()
+    )
+    Choice.objects.create(
+        choice_text="Choice 1",
+        question=question
+    )
+
+    Choice.objects.create(
+        choice_text="Choice 2",
+        question=question
     )
 
     data = service.get_question(question_id=1)
@@ -28,7 +40,10 @@ def test_get_question_data_returns_expected_data(service):
         'id': 1,
         'pub_date': '2020-10-10T00:00:00Z',
         'question_text': 'First question',
-        'choices': []
+        'choices': [
+            OrderedDict([('id', 1), ('choice_text', 'Choice 1'), ('votes', 0)]),
+            OrderedDict([('id', 2), ('choice_text', 'Choice 2'), ('votes', 0)])
+        ]
     }
 
 
