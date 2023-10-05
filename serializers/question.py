@@ -1,15 +1,14 @@
 """Covers all the serializers for models."""
-from django.utils import timezone
-from rest_framework import serializers
-from rest_framework.exceptions import ErrorDetail, ValidationError
-from rest_framework.exceptions import ValidationError
 from django.db import transaction
+from rest_framework import serializers
 
-from polls.models import Question, Choice
+from polls.models import Choice, Question
+
 
 class ChoiceSerializer(serializers.ModelSerializer):
     """The choice serializer."""
     id = serializers.IntegerField(required=False)
+
     class Meta:
         model = Choice
         fields = ['id', 'choice_text', 'votes']
