@@ -1,15 +1,15 @@
 """Tests related to the question serializer."""
-import pytest
 from collections import OrderedDict
 from datetime import datetime
-from django.http import HttpResponse
-from django.test import RequestFactory
-from django.utils import timezone
 from zoneinfo import ZoneInfo
 
+import pytest
+from django.utils import timezone
+
+from exceptions import ServiceException
 from polls.models import Choice, Question
-from serializers.question import QuestionSerializer, ChoiceSerializer
 from repositories import get_question_repository
+from serializers.question import QuestionSerializer
 
 
 @pytest.mark.parametrize(
@@ -284,3 +284,28 @@ def test_serializer_does_atomic_transactions():
 
     # Tests question text does not change as choice with id=1 does not exists.
     assert questions[0].question_text == "question 1"
+
+
+@pytest.mark.django_db(reset_sequences=True)
+def test_expected_error_raised_when_passing_choice_id_when_question_creating():
+    """Tests expected error is raised when passing data when creating the choices."""
+    all_questions = get_question_repository()._model.objects.all()
+
+    assert len(all_questions) == 0
+
+    valid_data = {
+        "question_text": "abc",
+        "pub_date": datetime(year=2000, month=10, day=5),
+        "choices": [{"choice_text": "abc", "id": 10}]
+    }
+
+    with pytest.raises(ServiceException) as error:
+        serializer = QuestionSerializer(data=valid_data)
+        serializer.is_valid()
+        serializer.save()
+
+    assert str(error.value) == "Choice ID should not be passed when question creation."
+
+    Question.objects.all()
+
+    assert len(all_questions) == 0

@@ -2,6 +2,7 @@
 from django.db import transaction
 from rest_framework import serializers
 
+from exceptions import ServiceException
 from polls.models import Choice, Question
 
 
@@ -31,6 +32,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             question_choices = validated_data.pop('choices')
         except KeyError:
             question_choices = []
+        self._check_choice_id_not_passed(question_choices)
         question = Question.objects.create(**validated_data)
 
         for choice in question_choices:
@@ -60,3 +62,14 @@ class QuestionSerializer(serializers.ModelSerializer):
             raise error
 
         return instance
+
+    def _check_choice_id_not_passed(self, question_choices: list):
+        """We should make sure choice ID is not passed when creating choices.
+
+        This function checks the ID of the nested choice is not passed when creating the object.
+        """
+        for question_choice in question_choices:
+            if question_choice.get("id"):
+                raise ServiceException(
+                    "Choice ID should not be passed when question creation."
+                )
