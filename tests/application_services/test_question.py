@@ -6,7 +6,7 @@ import pytest
 from freezegun import freeze_time
 
 from application_services import get_question_service, QuestionService
-from exceptions import ServiceException
+from exceptions import ServiceException, SerializerException
 from polls.models import Choice, Question
 
 
@@ -195,13 +195,14 @@ def test_update_question_raises_exception_if_data_not_valid(service):
         pub_date=datetime.now()
     )
 
-    with pytest.raises(ServiceException) as error:
+    with pytest.raises(SerializerException) as error:
         service.update_question(
             question_id=1,
             question_data={"invalid_key": "invalid_value"}
         )
 
     assert str(error.value) == (
+        "Data could not be serialized."
         "{'question_text': [ErrorDetail(string='This field is required.', code='required')], "
         "'pub_date': [ErrorDetail(string='This field is required.', code='required')]}"
     )

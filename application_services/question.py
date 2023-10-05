@@ -1,7 +1,7 @@
 """The question application service to do actions on questions."""
 from repositories.question import QuestionRepo
 from django.utils import timezone
-from exceptions import ServiceException
+from exceptions import ServiceException, SerializerException
 from polls.models import Question
 
 
@@ -43,7 +43,7 @@ class QuestionService:
         if serializer.is_valid():
             serializer.update(instance=question, validate_data=serializer.validated_data)
         else:
-            raise ServiceException(serializer.errors)
+            raise SerializerException(message="Data could not be serialized.", errors=serializer.errors)
 
         return serializer.data
 
