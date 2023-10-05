@@ -25,7 +25,7 @@ def test_get_question_for_invalid_id():
     response = client.get('/polls/question/1')
 
     assert response.status_code == 400
-    assert response.json() == {'message': 'Question not found', 'status': 'error'}
+    assert response.json() == {'message': 'Question not found.', 'status': 'error'}
 
 
 @freeze_time("2020-10-10")

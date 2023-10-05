@@ -159,7 +159,7 @@ def test_update_question_raises_expected_error_and_is_transactional(service):
 
     assert len(question.choices.all()) == 2
 
-    with pytest.raises(Choice.DoesNotExist) as error:
+    with pytest.raises(ServiceException) as error:
         data = service.update_question(
             question_id=1,
             question_data={

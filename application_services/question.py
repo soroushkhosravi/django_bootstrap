@@ -3,6 +3,7 @@ from repositories.question import QuestionRepo
 from django.utils import timezone
 from exceptions import ServiceException, SerializerException
 from polls.models import Question
+from polls.models import Choice
 
 
 class QuestionService:
@@ -31,6 +32,17 @@ class QuestionService:
 
         return self._data_serializer(question).data
 
+    def add_q(self, data):
+        """Adds a question by it's data."""
+        serializer = self._data_serializer(data)
+
+        if serializer.is_valid():
+            serializer.save()
+        else:
+            raise SerializerException(message="Data could not be serialized.", errors=serializer.errors)
+
+        return serializer.data
+
     def update_question(self, question_id, question_data) -> dict:
         """Updates a question by it's ID."""
         question = self._repo.get_question(question_id=question_id)
@@ -41,7 +53,10 @@ class QuestionService:
         serializer = self._data_serializer(question, data=question_data)
 
         if serializer.is_valid():
-            serializer.update(instance=question, validate_data=serializer.validated_data)
+            try:
+                serializer.update(instance=question, validate_data=serializer.validated_data)
+            except Choice.DoesNotExist as error:
+                raise ServiceException(f'{str(error)}')
         else:
             raise SerializerException(message="Data could not be serialized.", errors=serializer.errors)
 

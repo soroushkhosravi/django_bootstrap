@@ -58,7 +58,7 @@ class QuestionSerializer(serializers.ModelSerializer):
                             question_choice.save()
                         else:
                             Choice.objects.create(**choice, question=instance)
-        except Exception as error:
+        except Choice.DoesNotExist as error:
             raise error
 
         return instance
