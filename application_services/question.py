@@ -43,7 +43,7 @@ class QuestionService:
         if serializer.is_valid():
             serializer.update(instance=question, validate_data=serializer.validated_data)
         else:
-            raise ServiceException(str(serializer.errors))
+            raise ServiceException(serializer.errors)
 
         return serializer.data
 

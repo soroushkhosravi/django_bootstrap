@@ -24,7 +24,6 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        # fields = '__all__'
         fields = ['id', 'question_text', 'pub_date', 'choices']
 
     def create(self, validated_data: dict):
@@ -58,7 +57,7 @@ class QuestionSerializer(serializers.ModelSerializer):
                             question_choice.save()
                         else:
                             Choice.objects.create(**choice, question=instance)
-        except Exception:
-            pass
+        except Exception as error:
+            raise error
 
         return instance

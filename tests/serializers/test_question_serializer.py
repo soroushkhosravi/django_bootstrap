@@ -272,7 +272,10 @@ def test_serializer_does_atomic_transactions():
 
     serializer = QuestionSerializer(question, data=valid_data_with_not_existing_choice_for_update)
     serializer.is_valid()
-    question = serializer.save()
+    with pytest.raises(Choice.DoesNotExist) as error:
+        question = serializer.save()
+
+    assert str(error.value) == "Choice matching query does not exist."
 
     assert question.id == 1
 
