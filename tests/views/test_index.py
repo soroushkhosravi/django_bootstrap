@@ -1,10 +1,12 @@
 """Tests related to the index view."""
+import json
+from datetime import datetime
+
 import pytest
 from django.test import Client
-from polls.models import Question, Choice
-from datetime import datetime
 from freezegun import freeze_time
-import json
+
+from polls.models import Choice, Question
 
 
 @pytest.mark.django_db(reset_sequences=True)
@@ -125,3 +127,50 @@ def test_updated_for_invalid_data():
 
     assert response.status_code == 400
     assert response.json() == {"message": "Choice matching query does not exist.", "status": "error"}
+
+
+@pytest.mark.django_db(reset_sequences=True)
+def test_delete_deletes_existing_question():
+    """Tests deleting a question."""
+    question = Question.objects.create(
+        question_text="First question.",
+        pub_date=datetime.now()
+    )
+
+    Choice.objects.create(question=question, choice_text="Choice 1", votes=10)
+
+    client = Client()
+
+    response = client.delete('/polls/question/1')
+
+    assert response.status_code == 200
+    assert response.json() == {"message": "question 1 deleted.", "status": "success"}
+
+    questions = Question.objects.all()
+
+    assert len(questions) == 0
+
+
+@pytest.mark.django_db(reset_sequences=True)
+def test_delete_returns_expected_response_for_not_existing_question():
+    """Tests deleting a question."""
+    question = Question.objects.create(
+        question_text="First question.",
+        pub_date=datetime.now()
+    )
+
+    Choice.objects.create(question=question, choice_text="Choice 1", votes=10)
+
+    client = Client()
+
+    response = client.delete('/polls/question/10')
+
+    assert response.status_code == 400
+    assert response.json() == {"message": "Question not found.", "status": "error"}
+
+    questions = Question.objects.all()
+
+    assert len(questions) == 1
+
+
+

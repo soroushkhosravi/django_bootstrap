@@ -31,6 +31,10 @@ def question(request, question_id):
             return JsonResponse(data={"message": str(error), "status": "error"}, status=400)
 
     elif request.method == "DELETE":
-        question_service.delete_question(question_id=question_id)
+        try:
+            question_service.delete_question(question_id=question_id)
+        except ServiceException as error:
+            return JsonResponse(data={"message": str(error), "status": "error"}, status=400)
+        return JsonResponse({"message": f"question {question_id} deleted.", "status": "success"})
 
 
