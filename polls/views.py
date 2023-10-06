@@ -22,12 +22,15 @@ def question(request, question_id):
         except ServiceException as error:
             return JsonResponse(data={"message": str(error), "status": "error"}, status=400)
 
-    if request.method == 'PUT':
+    elif request.method == 'PUT':
         data = JSONParser().parse(request)
         try:
             data = question_service.update_question(question_id=question_id, question_data=data)
             return JsonResponse(data=data)
         except (ServiceException, SerializerException) as error:
             return JsonResponse(data={"message": str(error), "status": "error"}, status=400)
+
+    elif request.method == "DELETE":
+        question_service.delete_question(question_id=question_id)
 
 
