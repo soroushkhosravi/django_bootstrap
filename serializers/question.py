@@ -43,7 +43,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     def update(self, instance, validate_data: dict):
         """Updates an instance through passed data."""
         try:
-            with transaction.atomic():
+            with transaction.atomic(durable=True):
                 instance.question_text = validate_data.get("question_text", instance.question_text)
                 instance.pub_date = validate_data.get("pub_date", instance.pub_date)
                 instance.save()
