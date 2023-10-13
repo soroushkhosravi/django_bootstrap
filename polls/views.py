@@ -5,10 +5,12 @@ from django.views.decorators.csrf import csrf_exempt
 from application_services import get_question_service
 from exceptions import ServiceException, SerializerException
 from rest_framework.parsers import JSONParser
+from src.crema.domain.books import create_book, create_cook
 
 
 def index(request):
-    get_question_service().add_question(question_text="A question from app service.")
+    create_book(book_title="The first book")
+    create_cook(cook_name="soroush")
     return JsonResponse({"message": "successful."}, status=200)
 
 

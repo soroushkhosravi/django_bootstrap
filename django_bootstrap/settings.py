@@ -32,6 +32,7 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 # Application definition
 
 INSTALLED_APPS = [
+    "src.crema.data_models",
     'polls.apps.PollsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
