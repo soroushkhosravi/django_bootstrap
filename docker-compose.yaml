@@ -13,6 +13,8 @@ services:
     depends_on:
       - db
       - cache
+    ports:
+      - 8000:8000
   db:
     image: postgres:15
     ports:

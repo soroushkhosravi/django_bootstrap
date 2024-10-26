@@ -6,6 +6,10 @@ from application_services import get_question_service
 from exceptions import ServiceException, SerializerException
 from rest_framework.parsers import JSONParser
 from src.crema.domain.books import create_book, create_cook
+from django.shortcuts import render
+from dataclasses import dataclass
+import json
+from django.middleware.csrf import get_token
 
 
 def index(request):
@@ -39,4 +43,18 @@ def question(request, question_id):
             return JsonResponse(data={"message": str(error), "status": "error"}, status=400)
         return JsonResponse({"message": f"question {question_id} deleted.", "status": "success"})
 
+@dataclass
+class Person:
+    name: str
+    family: str
+
+def show_template(request):
+    response = JsonResponse({"message": "Post request successfully created."})
+    return  response
+
+def get_token_for(request):
+    token = get_token(request)
+    response = JsonResponse({"token": token})
+    request.session["name"] = "soroush"
+    return response
 
